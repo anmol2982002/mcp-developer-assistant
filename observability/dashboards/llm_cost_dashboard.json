@@ -1,0 +1,515 @@
+{
+    "annotations": {
+        "list": []
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 1,
+    "id": null,
+    "links": [],
+    "liveNow": true,
+    "panels": [
+        {
+            "title": "LLM Cost Overview",
+            "type": "row",
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 0
+            },
+            "collapsed": false
+        },
+        {
+            "title": "Total Tokens (24h)",
+            "type": "stat",
+            "gridPos": {
+                "h": 4,
+                "w": 6,
+                "x": 0,
+                "y": 1
+            },
+            "targets": [
+                {
+                    "expr": "sum(increase(mcp_llm_tokens_total[24h]))",
+                    "legendFormat": "Tokens"
+                }
+            ],
+            "options": {
+                "colorMode": "value",
+                "graphMode": "area"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "short",
+                    "thresholds": {
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "yellow",
+                                "value": 100000
+                            },
+                            {
+                                "color": "red",
+                                "value": 500000
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "title": "Estimated Cost (24h)",
+            "type": "stat",
+            "gridPos": {
+                "h": 4,
+                "w": 6,
+                "x": 6,
+                "y": 1
+            },
+            "targets": [
+                {
+                    "expr": "sum(increase(mcp_llm_input_tokens_total[24h])) * 0.000003 + sum(increase(mcp_llm_output_tokens_total[24h])) * 0.000015",
+                    "legendFormat": "$ USD"
+                }
+            ],
+            "options": {
+                "colorMode": "value",
+                "graphMode": "area"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "currencyUSD",
+                    "decimals": 2,
+                    "thresholds": {
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "yellow",
+                                "value": 5
+                            },
+                            {
+                                "color": "red",
+                                "value": 20
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "title": "LLM Calls (24h)",
+            "type": "stat",
+            "gridPos": {
+                "h": 4,
+                "w": 6,
+                "x": 12,
+                "y": 1
+            },
+            "targets": [
+                {
+                    "expr": "sum(increase(mcp_llm_calls_total[24h]))",
+                    "legendFormat": "Calls"
+                }
+            ],
+            "options": {
+                "colorMode": "value",
+                "graphMode": "area"
+            }
+        },
+        {
+            "title": "Cache Hit Rate",
+            "type": "gauge",
+            "gridPos": {
+                "h": 4,
+                "w": 6,
+                "x": 18,
+                "y": 1
+            },
+            "targets": [
+                {
+                    "expr": "mcp_intent_cache_hit_rate",
+                    "legendFormat": "Hit Rate"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "percentunit",
+                    "min": 0,
+                    "max": 1,
+                    "thresholds": {
+                        "steps": [
+                            {
+                                "color": "red",
+                                "value": null
+                            },
+                            {
+                                "color": "yellow",
+                                "value": 0.5
+                            },
+                            {
+                                "color": "green",
+                                "value": 0.7
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "title": "Token Usage Over Time",
+            "type": "row",
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 5
+            },
+            "collapsed": false
+        },
+        {
+            "title": "Input vs Output Tokens",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 6
+            },
+            "targets": [
+                {
+                    "expr": "rate(mcp_llm_input_tokens_total[5m])",
+                    "legendFormat": "Input Tokens/s"
+                },
+                {
+                    "expr": "rate(mcp_llm_output_tokens_total[5m])",
+                    "legendFormat": "Output Tokens/s"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "fillOpacity": 30,
+                        "lineWidth": 2
+                    }
+                }
+            },
+            "options": {
+                "legend": {
+                    "displayMode": "table",
+                    "placement": "right",
+                    "calcs": [
+                        "sum",
+                        "mean"
+                    ]
+                }
+            }
+        },
+        {
+            "title": "Token Usage by Provider",
+            "type": "piechart",
+            "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 12,
+                "y": 6
+            },
+            "targets": [
+                {
+                    "expr": "sum by (provider) (increase(mcp_llm_tokens_total[24h]))",
+                    "legendFormat": "{{provider}}"
+                }
+            ],
+            "options": {
+                "legend": {
+                    "displayMode": "table",
+                    "placement": "right"
+                }
+            }
+        },
+        {
+            "title": "Token Usage by Model",
+            "type": "piechart",
+            "gridPos": {
+                "h": 8,
+                "w": 6,
+                "x": 18,
+                "y": 6
+            },
+            "targets": [
+                {
+                    "expr": "sum by (model) (increase(mcp_llm_tokens_total[24h]))",
+                    "legendFormat": "{{model}}"
+                }
+            ],
+            "options": {
+                "legend": {
+                    "displayMode": "table",
+                    "placement": "right"
+                }
+            }
+        },
+        {
+            "title": "LLM Performance",
+            "type": "row",
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 14
+            },
+            "collapsed": false
+        },
+        {
+            "title": "LLM Latency (p95)",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 15
+            },
+            "targets": [
+                {
+                    "expr": "histogram_quantile(0.95, rate(mcp_llm_latency_seconds_bucket[5m]))",
+                    "legendFormat": "{{provider}} p95"
+                },
+                {
+                    "expr": "histogram_quantile(0.50, rate(mcp_llm_latency_seconds_bucket[5m]))",
+                    "legendFormat": "{{provider}} p50"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "s",
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "lineWidth": 2
+                    }
+                }
+            }
+        },
+        {
+            "title": "LLM Call Rate",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 15
+            },
+            "targets": [
+                {
+                    "expr": "rate(mcp_llm_calls_total[5m])",
+                    "legendFormat": "{{provider}}/{{model}}"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "reqps",
+                    "custom": {
+                        "fillOpacity": 20
+                    }
+                }
+            }
+        },
+        {
+            "title": "Cost Tracking",
+            "type": "row",
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 23
+            },
+            "collapsed": false
+        },
+        {
+            "title": "Daily Cost Trend",
+            "type": "timeseries",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 0,
+                "y": 24
+            },
+            "targets": [
+                {
+                    "expr": "(increase(mcp_llm_input_tokens_total[1h]) * 0.000003 + increase(mcp_llm_output_tokens_total[1h]) * 0.000015)",
+                    "legendFormat": "Hourly Cost"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "currencyUSD",
+                    "color": {
+                        "mode": "continuous-GrYlRd"
+                    },
+                    "custom": {
+                        "fillOpacity": 40
+                    }
+                }
+            }
+        },
+        {
+            "title": "Cost by Operation",
+            "type": "table",
+            "gridPos": {
+                "h": 8,
+                "w": 12,
+                "x": 12,
+                "y": 24
+            },
+            "targets": [
+                {
+                    "expr": "topk(10, sum by (tool) (increase(mcp_llm_tokens_total[24h])))",
+                    "legendFormat": "{{tool}}",
+                    "instant": true
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {},
+                "overrides": [
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "Value"
+                        },
+                        "properties": [
+                            {
+                                "id": "displayName",
+                                "value": "Tokens (24h)"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "title": "Efficiency Metrics",
+            "type": "row",
+            "gridPos": {
+                "h": 1,
+                "w": 24,
+                "x": 0,
+                "y": 32
+            },
+            "collapsed": false
+        },
+        {
+            "title": "Tokens per Request",
+            "type": "stat",
+            "gridPos": {
+                "h": 4,
+                "w": 6,
+                "x": 0,
+                "y": 33
+            },
+            "targets": [
+                {
+                    "expr": "sum(rate(mcp_llm_tokens_total[1h])) / sum(rate(mcp_llm_calls_total[1h]))",
+                    "legendFormat": "Avg Tokens/Call"
+                }
+            ],
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "short",
+                    "decimals": 0
+                }
+            }
+        },
+        {
+            "title": "Cache Savings (Est.)",
+            "type": "stat",
+            "gridPos": {
+                "h": 4,
+                "w": 6,
+                "x": 6,
+                "y": 33
+            },
+            "targets": [
+                {
+                    "expr": "sum(increase(mcp_intent_cache_semantic_matches_total[24h])) * 500 * 0.000003",
+                    "legendFormat": "$ Saved"
+                }
+            ],
+            "options": {
+                "colorMode": "value"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "unit": "currencyUSD",
+                    "decimals": 2,
+                    "color": {
+                        "mode": "fixed",
+                        "fixedColor": "green"
+                    }
+                }
+            }
+        },
+        {
+            "title": "Summarization Requests",
+            "type": "stat",
+            "gridPos": {
+                "h": 4,
+                "w": 6,
+                "x": 12,
+                "y": 33
+            },
+            "targets": [
+                {
+                    "expr": "sum(increase(mcp_summarization_requests_total[24h]))",
+                    "legendFormat": "Summaries"
+                }
+            ]
+        },
+        {
+            "title": "Code Reviews",
+            "type": "stat",
+            "gridPos": {
+                "h": 4,
+                "w": 6,
+                "x": 18,
+                "y": 33
+            },
+            "targets": [
+                {
+                    "expr": "sum(increase(mcp_code_review_requests_total[24h]))",
+                    "legendFormat": "Reviews"
+                }
+            ]
+        }
+    ],
+    "refresh": "30s",
+    "schemaVersion": 38,
+    "style": "dark",
+    "tags": [
+        "mcp",
+        "llm",
+        "cost",
+        "tokens"
+    ],
+    "templating": {
+        "list": []
+    },
+    "time": {
+        "from": "now-24h",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "MCP LLM Cost & Token Tracking",
+    "uid": "mcp-llm-cost",
+    "version": 1
+}

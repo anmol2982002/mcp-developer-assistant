@@ -1,0 +1,217 @@
+# Tool Intent Specifications
+# Configurable rules for intent validation
+
+# Default settings
+defaults:
+  llm_provider: groq
+  llm_model: llama-3.3-70b-versatile
+  cache_ttl_seconds: 3600
+  confidence_threshold: 0.7
+  fallback_to_rules: true
+
+# Tool specifications
+tools:
+  read_file:
+    description: "Read non-sensitive code/docs for understanding"
+    intent: "Access source code files, documentation, and configuration for code review or understanding"
+    risk_level: low
+    allowed_patterns:
+      - "*.py"
+      - "*.js"
+      - "*.ts"
+      - "*.jsx"
+      - "*.tsx"
+      - "*.md"
+      - "*.txt"
+      - "*.json"
+      - "*.yaml"
+      - "*.yml"
+      - "*.toml"
+      - "*.xml"
+      - "*.html"
+      - "*.css"
+      - "*.go"
+      - "*.rs"
+      - "*.java"
+      - "*.c"
+      - "*.cpp"
+      - "*.h"
+      - "README*"
+      - "LICENSE*"
+      - "Makefile"
+      - "Dockerfile"
+      - "*.sh"
+    forbidden_patterns:
+      - ".env"
+      - ".env.*"
+      - "*.env"
+      - "secrets/"
+      - "credentials/"
+      - ".git/config"
+      - "*.pem"
+      - "*.key"
+      - "*.p12"
+      - "*.pfx"
+      - "*password*"
+      - "*secret*"
+      - "*api_key*"
+      - "*token*"
+      - "id_rsa*"
+      - "*.sqlite"
+      - "*.db"
+    sensitivity_score: 0.3
+
+  search_files:
+    description: "Find code patterns, search codebase"
+    intent: "Search for code patterns, function definitions, imports, or usage examples"
+    risk_level: low
+    allowed_intents:
+      - "code search"
+      - "find imports"
+      - "locate function"
+      - "find usage"
+      - "search for class"
+      - "find definition"
+      - "grep pattern"
+    forbidden_intents:
+      - "get all API keys"
+      - "extract credentials"
+      - "find passwords"
+      - "search secrets"
+      - "find tokens"
+      - "extract environment"
+    sensitivity_score: 0.2
+
+  git_diff:
+    description: "Review changes, understand PRs"
+    intent: "Review git changes, commit diffs, and pull request modifications"
+    risk_level: medium
+    allowed_intents:
+      - "see what changed"
+      - "review commit"
+      - "understand changes"
+      - "check diff"
+      - "compare versions"
+    forbidden_intents:
+      - "find secrets in history"
+      - "extract all commits"
+      - "git log for passwords"
+      - "search history for keys"
+    sensitivity_score: 0.4
+
+  git_status:
+    description: "Check repository state"
+    intent: "Check current git status, modified files, and branch information"
+    risk_level: low
+    allowed_intents:
+      - "check status"
+      - "see changes"
+      - "list modified files"
+      - "current branch"
+    forbidden_intents: []
+    sensitivity_score: 0.1
+
+  git_log:
+    description: "View commit history"
+    intent: "View recent commits, authors, and commit messages"
+    risk_level: low
+    allowed_intents:
+      - "view history"
+      - "recent commits"
+      - "commit log"
+      - "who changed"
+    forbidden_intents:
+      - "find api keys"
+      - "search for secrets"
+    sensitivity_score: 0.2
+
+  list_dir:
+    description: "Explore codebase structure"
+    intent: "List directory contents, explore project structure"
+    risk_level: low
+    allowed_intents:
+      - "list files"
+      - "see directory"
+      - "explore project"
+      - "folder contents"
+    forbidden_intents:
+      - "list credentials"
+      - "find secret files"
+    forbidden_patterns:
+      - "secrets/"
+      - "credentials/"
+      - ".ssh/"
+    sensitivity_score: 0.1
+
+  extract_symbols:
+    description: "Extract code symbols and structure"
+    intent: "Parse code to extract functions, classes, and other symbols"
+    risk_level: low
+    allowed_intents:
+      - "find functions"
+      - "list classes"
+      - "code structure"
+      - "extract definitions"
+    forbidden_intents: []
+    sensitivity_score: 0.1
+
+  ask_about_code:
+    description: "Ask questions about codebase using AI"
+    intent: "Use AI to answer questions about code, architecture, or implementation"
+    risk_level: medium
+    allowed_intents:
+      - "explain code"
+      - "how does it work"
+      - "architecture question"
+      - "understand implementation"
+    forbidden_intents:
+      - "extract secrets"
+      - "reveal passwords"
+    sensitivity_score: 0.3
+
+  review_changes:
+    description: "AI-powered code review"
+    intent: "Get AI-powered code review suggestions for changes"
+    risk_level: medium
+    allowed_intents:
+      - "review code"
+      - "check quality"
+      - "find issues"
+      - "suggest improvements"
+    forbidden_intents: []
+    sensitivity_score: 0.3
+
+# Semantic cache settings
+semantic_cache:
+  enabled: true
+  similarity_threshold: 0.85  # Cosine similarity threshold for cache hits
+  max_cache_size: 10000
+  embedding_model: "all-MiniLM-L6-v2"
+  normalize_embeddings: true
+
+# LLM prompt templates
+prompts:
+  intent_validation: |
+    You are a security-focused intent validator for a code assistant tool.
+    
+    Tool: {tool_name}
+    Tool Purpose: {tool_intent}
+    Request Parameters: {params}
+    User's Stated Goal: {user_intent}
+    
+    Analyze if this request aligns with the tool's intended purpose.
+    Consider:
+    1. Is the user trying to access sensitive information (secrets, credentials, API keys)?
+    2. Does the request match legitimate development tasks?
+    3. Are there any signs of data exfiltration or misuse?
+    4. Is the stated goal consistent with the actual request?
+    
+    Respond with JSON only:
+    {{"is_valid": true/false, "confidence": 0.0-1.0, "reason": "brief explanation"}}
+
+  batch_validation: |
+    Validate the following {count} tool requests against their intents.
+    Respond with a JSON array of results.
+    
+    Requests:
+    {requests}

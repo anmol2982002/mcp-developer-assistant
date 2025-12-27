@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "mcp-developer-assistant": {
+      "command": "python",
+      "args": ["-m", "server.mcp_server"],
+      "cwd": "/path/to/mcp-developer-assistant",
+      "env": {
+        "PYTHONPATH": "/path/to/mcp-developer-assistant"
+      }
+    }
+  }
+}

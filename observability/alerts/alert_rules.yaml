@@ -1,0 +1,151 @@
+# Prometheus Alert Rules for MCP ML Components
+# Place in Prometheus alerting rules directory
+
+groups:
+  - name: mcp_ml_anomaly_alerts
+    interval: 30s
+    rules:
+      # High-risk anomaly alert
+      - alert: MCPHighRiskAnomaly
+        expr: increase(mcp_anomaly_explanations_total{risk_level=~"HIGH|CRITICAL"}[5m]) > 5
+        for: 1m
+        labels:
+          severity: critical
+          component: anomaly_detection
+        annotations:
+          summary: "High-risk anomalies detected"
+          description: "{{ $value }} high-risk anomalies detected in the last 5 minutes"
+          runbook_url: "https://docs.example.com/runbooks/mcp-anomaly"
+
+      # Anomaly rate spike
+      - alert: MCPAnomalyRateSpike
+        expr: |
+          (
+            rate(mcp_anomalies_detected_total[5m]) / 
+            rate(mcp_anomalies_detected_total[1h] offset 1h)
+          ) > 3
+        for: 2m
+        labels:
+          severity: warning
+          component: anomaly_detection
+        annotations:
+          summary: "Anomaly detection rate spike"
+          description: "Anomaly rate is {{ $value }}x higher than baseline"
+
+      # Specific user anomaly pattern
+      - alert: MCPUserAnomalyPattern
+        expr: increase(mcp_anomalies_detected_total[10m]) > 10
+        for: 5m
+        labels:
+          severity: warning
+          component: anomaly_detection
+        annotations:
+          summary: "User {{ $labels.user }} triggering frequent anomalies"
+          description: "User has triggered {{ $value }} anomalies in 10 minutes"
+
+  - name: mcp_ml_intent_alerts
+    interval: 30s
+    rules:
+      # Intent violations spike
+      - alert: MCPIntentViolationsSpike
+        expr: rate(mcp_intent_violations_total[5m]) > 1
+        for: 2m
+        labels:
+          severity: warning
+          component: intent_checker
+        annotations:
+          summary: "Intent violations increasing"
+          description: "{{ $value }} intent violations per second on tool {{ $labels.tool }}"
+
+      # Intent cache degradation
+      - alert: MCPIntentCacheDegradation
+        expr: mcp_intent_cache_hit_rate < 0.5
+        for: 10m
+        labels:
+          severity: warning
+          component: intent_checker
+        annotations:
+          summary: "Intent cache hit rate low"
+          description: "Cache hit rate is {{ $value }}, expected > 0.7"
+
+      # LLM unavailable (high latency)
+      - alert: MCPLLMHighLatency
+        expr: histogram_quantile(0.95, rate(mcp_intent_check_latency_seconds_bucket[5m])) > 5
+        for: 5m
+        labels:
+          severity: warning
+          component: llm_client
+        annotations:
+          summary: "LLM intent check latency high"
+          description: "p95 latency is {{ $value }}s"
+
+  - name: mcp_ml_model_alerts
+    interval: 1m
+    rules:
+      # Model drift detection (using anomaly rate as proxy)
+      - alert: MCPModelDrift
+        expr: |
+          abs(
+            avg_over_time(rate(mcp_anomalies_detected_total[1h])[24h:1h]) -
+            rate(mcp_anomalies_detected_total[1h])
+          ) / avg_over_time(rate(mcp_anomalies_detected_total[1h])[24h:1h]) > 0.5
+        for: 30m
+        labels:
+          severity: warning
+          component: model
+        annotations:
+          summary: "Possible model drift detected"
+          description: "Anomaly rate deviates {{ $value | humanizePercentage }} from 24h average"
+
+      # Ensemble model imbalance
+      - alert: MCPEnsembleImbalance
+        expr: |
+          max(avg_over_time(mcp_ensemble_model_scores[1h])) - 
+          min(avg_over_time(mcp_ensemble_model_scores[1h])) > 0.3
+        for: 1h
+        labels:
+          severity: info
+          component: model
+        annotations:
+          summary: "Ensemble model disagreement"
+          description: "Models in ensemble are showing different scores"
+
+      # A/B test significant difference
+      - alert: MCPABTestSignificant
+        expr: |
+          abs(
+            avg(mcp_ab_test_performance_bucket{le="+Inf", metric="anomaly_rate"}) by (model_id) -
+            avg(avg(mcp_ab_test_performance_bucket{le="+Inf", metric="anomaly_rate"}) by (model_id))
+          ) > 0.1
+        for: 2h
+        labels:
+          severity: info
+          component: ab_testing
+        annotations:
+          summary: "A/B test showing significant difference"
+          description: "Model {{ $labels.model_id }} performance differs from average"
+
+  - name: mcp_ml_system_alerts
+    interval: 30s
+    rules:
+      # Anomaly detection latency high
+      - alert: MCPAnomalyDetectionSlow
+        expr: histogram_quantile(0.95, rate(mcp_anomaly_detection_latency_seconds_bucket[5m])) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+          component: anomaly_detection
+        annotations:
+          summary: "Anomaly detection latency high"
+          description: "p95 detection latency is {{ $value }}s"
+
+      # Cache memory pressure (large cache size)
+      - alert: MCPIntentCacheLarge
+        expr: mcp_intent_cache_size > 9000
+        for: 10m
+        labels:
+          severity: info
+          component: intent_checker
+        annotations:
+          summary: "Intent cache approaching size limit"
+          description: "Cache has {{ $value }} entries (limit: 10000)"

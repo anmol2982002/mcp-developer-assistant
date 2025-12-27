@@ -1,0 +1,6 @@
+# Placeholder for models directory
+# ML models are stored here
+
+# Files:
+# - anomaly_detector.pkl - Isolation Forest for anomaly detection
+# - intent_classifier.pkl - Intent classification model (optional)

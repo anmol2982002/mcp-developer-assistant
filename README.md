@@ -2,67 +2,60 @@
   <img src="https://img.shields.io/badge/Python-3.11+-blue?style=for-the-badge&logo=python" alt="Python">
   <img src="https://img.shields.io/badge/FastAPI-0.104+-green?style=for-the-badge&logo=fastapi" alt="FastAPI">
   <img src="https://img.shields.io/badge/Docker-Ready-blue?style=for-the-badge&logo=docker" alt="Docker">
-  <img src="https://img.shields.io/badge/ML-Powered-purple?style=for-the-badge&logo=pytorch" alt="ML">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="License">
 </p>
 
 <h1 align="center">🤖 MCP Developer Assistant</h1>
 
 <p align="center">
-  <strong>A production-grade, AI-powered Model Context Protocol (MCP) server with enterprise security, behavioral anomaly detection, and intelligent code assistance.</strong>
+  <strong>A production-grade Model Context Protocol (MCP) server with AI-powered code intelligence, enterprise security, and behavioral anomaly detection.</strong>
 </p>
 
 <p align="center">
-  <a href="#-key-features">Features</a> •
+  <a href="#-features">Features</a> •
   <a href="#-architecture">Architecture</a> •
   <a href="#-quick-start">Quick Start</a> •
-  <a href="#-tools-available">Tools</a> •
   <a href="#-security">Security</a> •
-  <a href="#-observability">Observability</a>
+  <a href="#-documentation">Documentation</a>
 </p>
 
 ---
 
-## 🎯 Why This Project Stands Out
+## 🎯 Overview
 
-> **Built over 6 iterative phases**, this project demonstrates production-ready software engineering with **ML/AI integration**, **enterprise security patterns**, and **full observability** — the skills that matter for Staff/Senior ML Engineer roles.
+MCP Developer Assistant is a secure, intelligent bridge between AI assistants (Claude, VS Code Copilot, etc.) and your local development environment. It provides:
 
-| Skill Demonstrated | Implementation |
-|-------------------|----------------|
-| **ML Engineering** | Ensemble anomaly detection (Isolation Forest + LOF + One-Class SVM), SHAP explainability, model registry with A/B testing |
-| **LLM Integration** | Groq/OpenAI clients, semantic caching (70% LLM call reduction), intent validation with LLM-as-Judge pattern |
-| **Security** | OAuth 2.1 with PKCE, confused deputy prevention, sliding window rate limiting, audit logging with PII sanitization |
-| **Backend Development** | FastAPI async services, SQLAlchemy ORM, structured logging, Prometheus metrics |
-| **DevOps** | Multi-stage Docker builds, GitHub Actions CI/CD, Grafana dashboards, health checks |
-| **Code Quality** | 18 test files, type hints, BAML policy engine, comprehensive documentation |
+- **Smart Code Tools** — File operations, Git integration, and AST-based code analysis
+- **AI-Powered Intelligence** — Semantic code search, automated reviews, and natural language Q&A
+- **Enterprise Security** — OAuth 2.1, intent validation, behavioral anomaly detection
+- **Production Observability** — Prometheus metrics, Grafana dashboards, structured logging
 
 ---
 
-## 🚀 Key Features
+## ✨ Features
 
-### 🔧 Traditional Developer Tools
-- **File Tools** — Read, search, and list files with access control
-- **Git Tools** — Status, diff, log with enhanced parsing
-- **Code Analysis** — AST-based function/class extraction
+### Developer Tools
+| Tool | Description |
+|------|-------------|
+| `read_file` | Read files with syntax highlighting and line ranges |
+| `search_files` | Pattern-based code search across the codebase |
+| `git_status` / `git_diff` / `git_log` | Full Git integration |
+| `extract_functions` | AST-based code structure extraction |
 
-### 🧠 AI-Powered Tools
-- **`ask_about_code`** — Semantic code Q&A with RAG (BM25 + FAISS hybrid search)
-- **`summarize_repo`** — Generate intelligent project summaries
-- **`summarize_diff`** — AI-powered PR/commit summaries
-- **`review_changes`** — Automated code review with risk scoring
+### AI-Powered Tools
+| Tool | Description |
+|------|-------------|
+| `ask_about_code` | Natural language Q&A with semantic search (BM25 + FAISS) |
+| `summarize_repo` | Intelligent project overview generation |
+| `summarize_diff` | AI-generated PR/commit summaries |
+| `review_changes` | Automated code review with risk scoring |
 
-### 🛡️ Enterprise Security
-- **OAuth 2.1 Proxy** — Token validation, refresh token rotation, PKCE support
-- **Confused Deputy Prevention** — Per-client consent management
+### Security Layer
+- **OAuth 2.1 Proxy** with PKCE and token rotation
 - **Intent Checking** — LLM validates requests match tool purpose
-- **Behavioral Anomaly Detection** — ML learns normal patterns, flags suspicious access
-- **Rate Limiting** — Sliding window with per-user quotas and burst handling
-
-### 📊 Full Observability
-- **Prometheus Metrics** — 50+ custom metrics including ML confidence scores
-- **Grafana Dashboards** — Real-time anomaly detection, LLM cost tracking
-- **Structured Logging** — JSON format with request tracing
-- **Health Checks** — Kubernetes-ready endpoints
+- **Anomaly Detection** — Ensemble ML (Isolation Forest + LOF + One-Class SVM) learns patterns and flags suspicious access
+- **Rate Limiting** — Sliding window with per-user quotas
+- **Audit Logging** — PII-sanitized, structured JSON logs
 
 ---
 
@@ -75,33 +68,71 @@
 └────────────────────────┬────────────────────────────────────────┘
                          │ JSON-RPC 2.0
 ┌────────────────────────▼────────────────────────────────────────┐
-│              MCP PROXY (Security Gateway) :8001                  │
+│              SECURITY PROXY (:8001)                              │
 │  ┌────────────────────────────────────────────────────────────┐ │
-│  │ 1. OAuth 2.1 Token Validation                              │ │
-│  │ 2. Confused Deputy Prevention (Consent Check)              │ │
-│  │ 3. Intent Checking (LLM-as-Judge) ⭐ ML                    │ │
-│  │ 4. Behavioral Anomaly Detection (Ensemble) ⭐ ML           │ │
-│  │ 5. Sliding Window Rate Limiting                            │ │
-│  │ 6. Audit Logging with PII Sanitization                     │ │
+│  │ OAuth 2.1 → Consent Check → Intent Validation → Anomaly    │ │
+│  │ Detection → Rate Limiting → Audit Logging                  │ │
 │  └────────────────────────────────────────────────────────────┘ │
 └────────────────────────┬────────────────────────────────────────┘
-                         │ Authenticated Request
+                         │
 ┌────────────────────────▼────────────────────────────────────────┐
-│              MCP SERVER (Tool Execution) :8000                   │
-│  ┌─────────────────────────────────────────────────────────┐    │
-│  │ Policy Engine (BAML-based validation)                   │    │
-│  │ ├── File Tools (read, search, list)                     │    │
-│  │ ├── Git Tools (status, diff, log)                       │    │
-│  │ ├── Code Tools (extract functions, analyze imports)     │    │
-│  │ └── AI Tools (semantic search, summarize, review) ⭐    │    │
-│  └─────────────────────────────────────────────────────────┘    │
-│  ┌─────────────────────────────────────────────────────────┐    │
-│  │ ML Intelligence Layer                                    │    │
-│  │ ├── Hybrid Search (BM25 + FAISS embeddings)             │    │
-│  │ ├── Risk Scorer (ML-based change risk prediction)       │    │
-│  │ └── Output Validator (secret detection, PII filtering)  │    │
-│  └─────────────────────────────────────────────────────────┘    │
+│              MCP SERVER (:8000)                                  │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐  │
+│  │   File Tools    │  │   Git Tools     │  │   AI Tools      │  │
+│  │   Code Tools    │  │   Policy Engine │  │   Risk Scorer   │  │
+│  └─────────────────┘  └─────────────────┘  └─────────────────┘  │
 └─────────────────────────────────────────────────────────────────┘
+```
+
+### Request Flow
+
+```mermaid
+flowchart TB
+    subgraph Client["🖥️ MCP Client"]
+        A[Claude Desktop / VS Code]
+    end
+
+    subgraph Proxy["🛡️ Security Proxy :8001"]
+        B[OAuth 2.1 Validation]
+        C[Consent Check]
+        D[Intent Validation]
+        E[Anomaly Detection]
+        F[Rate Limiter]
+        G[Audit Logger]
+    end
+
+    subgraph Server["⚙️ MCP Server :8000"]
+        H[Policy Engine]
+        I[Tool Router]
+        subgraph Tools["Available Tools"]
+            J[File Tools]
+            K[Git Tools]
+            L[Code Tools]
+            M[AI Tools]
+        end
+    end
+
+    subgraph AI["🧠 AI/ML Layer"]
+        N[Hybrid Search]
+        O[Risk Scorer]
+        P[LLM Client]
+    end
+
+    A -->|JSON-RPC| B
+    B -->|Valid Token| C
+    C -->|Consent OK| D
+    D -->|Intent OK| E
+    E -->|Normal Pattern| F
+    F -->|Within Limit| G
+    G -->|Logged| H
+    H --> I
+    I --> J & K & L & M
+    M --> N & O & P
+
+    style Client fill:#e1f5fe
+    style Proxy fill:#fff3e0
+    style Server fill:#e8f5e9
+    style AI fill:#f3e5f5
 ```
 
 ---
@@ -109,151 +140,75 @@
 ## ⚡ Quick Start
 
 ### Prerequisites
-- Python 3.10+ (3.11 recommended)
+- Python 3.10+
 - Git
-- (Optional) Docker for containerized deployment
+- (Optional) Docker
 
 ### Installation
 
 ```bash
-# Clone the repository
+# Clone
 git clone https://github.com/yourusername/mcp-developer-assistant.git
 cd mcp-developer-assistant
 
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # Windows: .\venv\Scripts\activate
-
-# Install dependencies
+# Setup
+python -m venv venv && source venv/bin/activate  # Windows: .\venv\Scripts\activate
 pip install -r requirements.txt
 
-# Configure environment
+# Configure
 cp .env.example .env
-# Edit .env with your GROQ_API_KEY or OPENAI_API_KEY
+# Add your GROQ_API_KEY or OPENAI_API_KEY to .env
 
-# Initialize database
+# Initialize
 python scripts/setup_db.py
-
-# (Optional) Train ML models
-python scripts/train_models.py
+python scripts/train_models.py  # Optional: train ML models
 ```
 
-### Run the Server
+### Run
 
 ```bash
-# Start MCP Server
+# Development
 python -m uvicorn server.mcp_server:app --reload --port 8000
-
-# In another terminal - Start Proxy
 python -m uvicorn proxy.auth_gateway:app --reload --port 8001
+
+# Docker (Production)
+docker-compose up -d
 ```
 
-### Validate Installation
+### Verify
 
 ```bash
-# Run comprehensive project validation
-python scripts/validate_project.py
-
-# Run test suite
-pytest tests/ -v --cov=. --cov-report=html
+curl http://localhost:8000/health
+curl http://localhost:8000/tools | jq .
 ```
 
 ---
 
-## 🐳 Docker Deployment
+## 🔐 Security
 
-```bash
-# Start all services
-docker-compose up --build
+The proxy layer implements defense-in-depth security:
 
-# Access services:
-# - MCP Server:  http://localhost:8000
-# - Proxy:       http://localhost:8001  
-# - Grafana:     http://localhost:3000 (admin/admin)
-# - Prometheus:  http://localhost:9090
-```
-
----
-
-## 🛠️ Tools Available
-
-| Tool | Description | AI-Powered |
-|------|-------------|:----------:|
-| `read_file` | Read file with line range support | |
-| `search_files` | Regex/pattern search across files | |
-| `list_directory` | List directory contents | |
-| `git_status` | Repository status | |
-| `git_diff` | Show changes between refs | |
-| `git_log` | Commit history | |
-| `extract_functions` | AST-based function extraction | |
-| `ask_about_code` | Semantic code Q&A | ✅ |
-| `summarize_repo` | Project overview generation | ✅ |
-| `summarize_diff` | Change summary generation | ✅ |
-| `review_changes` | Automated code review | ✅ |
-
----
-
-## 🔐 Security Features
-
-### OAuth 2.1 Implementation
-- PKCE support for public clients
-- Refresh token rotation
-- Token introspection endpoint
-- Configurable scopes per client
-
-### ML-Based Intent Checking
-```python
-# Detects when tools are misused (e.g., read_file for secret exfiltration)
-intent_result = await intent_checker.validate_intent(
-    tool_name="read_file",
-    params={"path": ".env.production"},
-    user_intent="Review configuration"
-)
-# Returns: {is_valid: False, confidence: 0.95, reason: "Accessing secrets file"}
-```
-
-### Behavioral Anomaly Detection
-- **Ensemble Model**: Isolation Forest + Local Outlier Factor + One-Class SVM
-- **10+ Behavioral Features**: Request rate, tool sequences, time patterns, IP changes
-- **SHAP Explainability**: Human-readable explanations for anomalies
-- **Real-time Updates**: Continuous learning from audit logs
+| Layer | Description |
+|-------|-------------|
+| **Authentication** | OAuth 2.1 with PKCE, token introspection, refresh rotation |
+| **Authorization** | Per-client consent management, scope enforcement |
+| **Intent Validation** | LLM-as-Judge pattern detects tool misuse attempts |
+| **Anomaly Detection** | ML ensemble learns normal patterns, flags deviations |
+| **Rate Limiting** | Sliding window algorithm with burst handling |
+| **Audit Trail** | PII-sanitized structured logs with retention policies |
 
 ---
 
 ## 📊 Observability
 
-### Prometheus Metrics (50+ metrics)
-```
-mcp_requests_total{tool="read_file"}
-mcp_anomaly_score_bucket{le="0.5"}
-mcp_llm_tokens_total{provider="groq", model="llama-3.3-70b"}
-mcp_intent_cache_hit_rate
-```
+| Component | Description |
+|-----------|-------------|
+| **Prometheus** | 50+ custom metrics (latency, ML confidence, token usage) |
+| **Grafana** | Pre-built dashboards for anomalies, latency, LLM costs |
+| **Structured Logging** | JSON format with request correlation |
+| **Health Checks** | Kubernetes-ready `/health` endpoints |
 
-### Grafana Dashboards
-- **ML Anomaly Detection** — Real-time anomaly visualization, feature contributions
-- **Request Latency** — p50/p95/p99, error rates, rate limiting
-- **LLM Cost Tracking** — Token usage, estimated costs, cache savings
-
----
-
-## 🧪 Testing
-
-```bash
-# Run all tests with coverage
-pytest tests/ -v --cov=. --cov-report=html
-
-# Run specific test categories
-pytest tests/test_file_tools.py -v
-pytest tests/test_anomaly_detector.py -v
-pytest tests/test_code_review_phase5.py -v
-
-# Load testing
-pip install locust
-locust -f locustfile.py --host=http://localhost:8001
-```
-
-**Test Coverage**: 18 test files covering all phases
+Access Grafana at `http://localhost:3000` (admin/admin) when running with Docker.
 
 ---
 
@@ -261,88 +216,48 @@ locust -f locustfile.py --host=http://localhost:8001
 
 ```
 mcp-developer-assistant/
-├── proxy/                    # OAuth + Security Gateway
-│   ├── auth_gateway.py           # Main proxy (FastAPI)
-│   ├── intent_checker.py         # LLM intent validation
-│   ├── anomaly_detector.py       # Ensemble ML detection
-│   ├── rate_limiter.py           # Sliding window limiter
-│   └── consent_db.py             # Consent management
-│
-├── server/                   # MCP Server
-│   ├── mcp_server.py             # Tool dispatcher
-│   ├── tools/                    # Tool implementations
-│   └── policy_engine.py          # BAML policies
-│
-├── ai/                       # ML/AI Components
-│   ├── embedding_manager.py      # Sentence transformers
-│   ├── hybrid_search.py          # BM25 + FAISS
-│   ├── risk_scorer.py            # Risk prediction
-│   ├── model_trainer.py          # Training pipeline
-│   └── shap_explainer.py         # Explainability
-│
-├── observability/            # Monitoring
-│   ├── metrics.py                # Prometheus (608 lines)
-│   ├── dashboards/               # Grafana JSON
-│   └── health_check.py           # K8s-ready checks
-│
-├── tests/                    # 18 test files
-├── docs/                     # Documentation
-├── .github/workflows/        # CI/CD
-├── docker-compose.yml        # Full stack deployment
-└── locustfile.py             # Load testing
+├── proxy/              # Security gateway (OAuth, rate limiting, ML detection)
+├── server/             # MCP server and tool implementations
+├── ai/                 # ML components (embeddings, anomaly detection, risk scoring)
+├── observability/      # Metrics, logging, Grafana dashboards
+├── tests/              # Test suite (18 files)
+├── docs/               # API and usage documentation
+└── .github/workflows/  # CI/CD pipelines
 ```
 
 ---
 
-## 🛤️ Development Roadmap
+## 📚 Documentation
 
-| Phase | Status | Description |
-|-------|--------|-------------|
-| Phase 0 | ✅ Complete | Project structure (55+ files) |
-| Phase 1 | ✅ Complete | MVP Core (File/Git/Code tools) |
-| Phase 2 | ✅ Complete | Security & Proxy (OAuth 2.1) |
-| Phase 3 | ✅ Complete | ML Security (Anomaly Detection) |
-| Phase 4 | ✅ Complete | AI Tools (Semantic Search) |
-| Phase 5 | ✅ Complete | Code Review (Risk Scoring) |
-| Phase 6 | ✅ Complete | Production Ready (CI/CD, Docs) |
+| Document | Description |
+|----------|-------------|
+| [API Reference](docs/API.md) | Complete endpoint documentation |
+| [Developer Setup](docs/DEVELOPER_SETUP.md) | Development environment guide |
+| [Usage Guide](docs/USAGE_GUIDE.md) | End-to-end usage instructions |
 
 ---
 
-## 📄 Documentation
+## 🧪 Testing
 
-- [API Documentation](docs/API.md)
-- [Developer Setup Guide](docs/DEVELOPER_SETUP.md)
-- [Architecture Decisions](docs/ARCHITECTURE.md)
+```bash
+# Run tests
+pytest tests/ -v --cov=. --cov-report=html
+
+# Validate project structure
+python scripts/validate_project.py
+
+# Load testing
+pip install locust && locust -f locustfile.py --host=http://localhost:8001
+```
 
 ---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please read the [Contributing Guide](CONTRIBUTING.md) first.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Run tests (`pytest tests/ -v`)
-4. Commit your changes (`git commit -m 'Add amazing feature'`)
-5. Push to branch (`git push origin feature/amazing-feature`)
-6. Open a Pull Request
+Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ---
 
-## 📜 License
+## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 👨‍💻 Author
-
-**Built with ❤️ as a demonstration of production-grade ML engineering**
-
-*This project showcases the complete software development lifecycle: from architecture design through implementation, testing, and deployment — demonstrating the skills needed for Staff/Senior ML/Backend Engineering roles.*
-
----
-
-<p align="center">
-  <strong>If you found this useful, please ⭐ the repository!</strong>
-</p>
+MIT License - see [LICENSE](LICENSE) for details.
